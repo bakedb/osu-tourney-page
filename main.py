@@ -31,7 +31,7 @@ def format_song():
     except ValueError:
         diff_formatted = "Invalid stars"
     
-    formatted = f'{{ title: "{title}", artist: "{artist}", mode: "{mode}", diff: "{diff_formatted}", length: "{length}" }},'
+    formatted = f'{{ title: "{title}", artist: "{artist}", bracket: "{mode}", diff: "{diff_formatted}", length: "{length}" }},'
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, formatted)
 
@@ -75,9 +75,9 @@ ttk.Label(formatter_frame, text="Artist:").grid(row=1, column=0, sticky="w")
 artist_entry = ttk.Entry(formatter_frame, width=30)
 artist_entry.grid(row=1, column=1)
 
-ttk.Label(formatter_frame, text="Mode:").grid(row=2, column=0, sticky="w")
-mode_var = tk.StringVar(value="osu")
-mode_menu = ttk.Combobox(formatter_frame, textvariable=mode_var, values=["osu", "taiko", "ctb", "mania"], state="readonly")
+ttk.Label(formatter_frame, text="Bracket:").grid(row=2, column=0, sticky="w")
+mode_var = tk.StringVar(value="Select...")
+mode_menu = ttk.Combobox(formatter_frame, textvariable=mode_var, values=["normal", "hard", "insane", "expert"], state="readonly")
 mode_menu.grid(row=2, column=1)
 
 ttk.Label(formatter_frame, text="Stars:").grid(row=3, column=0, sticky="w")
