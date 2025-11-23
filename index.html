@@ -269,7 +269,7 @@
         </div>
         <div class="card">
           <h3>Getting started</h3>
-          <p>Sign in to access participant tags, match queues, and moderator controls.</p>
+          <p>Sign in to access participant tags, match queues, and admin controls.</p>
         </div>
         <div class="card">
           <h3>Community</h3>
@@ -324,12 +324,12 @@
         <h3>Beatmap explorer</h3>
         <div class="filters">
           <input id="search" class="input" type="text" placeholder="Search by title or artist" />
-          <select id="mode" class="select">
-            <option value="">All modes</option>
-            <option value="osu">osu!</option>
-            <option value="taiko">taiko</option>
-            <option value="ctb">ctb</option>
-            <option value="mania">mania</option>
+          <select id="bracket" class="select">
+            <option value="">All brackets</option>
+            <option value="osu">normal</option>
+            <option value="taiko">hard</option>
+            <option value="ctb">insane</option>
+            <option value="mania">expert</option>
           </select>
           <select id="diff" class="select">
             <option value="">All difficulties</option>
@@ -346,7 +346,7 @@
             <tr>
               <th>Title</th>
               <th>Artist</th>
-              <th>Mode</th>
+              <th>Bracket</th>
               <th>Difficulty</th>
               <th>Length</th>
             </tr>
@@ -528,18 +528,18 @@
        Beatmap data & filters
        ------------------------------ */
     const BEATMAPS = [
-      { title: "Freedom Dive", artist: "xi", mode: "osu", diff: "Expert", length: "4:57" },
+      { title: "Freedom Dive", artist: "xi", bracket: "osu", diff: "Expert", length: "4:57" },
     ];
 
     const tableBody = document.getElementById('beatmapTable');
     const searchEl = document.getElementById('search');
-    const modeEl = document.getElementById('mode');
+    const bracketEl = document.getElementById('bracket');
     const diffEl = document.getElementById('diff');
 
-    function modePill(mode) {
-      const m = mode.toLowerCase();
+    function bracketPill(bracket) {
+      const m = bracket.toLowerCase();
       const className = ['osu','taiko','ctb','mania'].includes(m) ? m : 'osu';
-      return `<span class="pill ${className}">${mode}</span>`;
+      return `<span class="pill ${className}">${bracket}</span>`;
     }
 
     function renderTable(rows) {
@@ -547,7 +547,7 @@
         <tr>
           <td>${r.title}</td>
           <td>${r.artist}</td>
-          <td>${modePill(r.mode)}</td>
+          <td>${bracketPill(r.bracket)}</td>
           <td>${r.diff}</td>
           <td>${r.length}</td>
         </tr>
@@ -556,21 +556,21 @@
 
     function applyFilters() {
       const q = searchEl.value.trim().toLowerCase();
-      const mode = modeEl.value;
+      const bracket = bracketEl.value;
       const diff = diffEl.value;
 
       const filtered = BEATMAPS.filter(b => {
         const matchesQ = !q || b.title.toLowerCase().includes(q) || b.artist.toLowerCase().includes(q);
-        const matchesMode = !mode || b.mode === mode;
+        const matchesBracket = !bracket || b.bracket === bracket;
         const matchesDiff = !diff || b.diff === diff;
-        return matchesQ && matchesMode && matchesDiff;
+        return matchesQ && matchesBracket && matchesDiff;
       });
 
       renderTable(filtered);
     }
 
     searchEl.addEventListener('input', applyFilters);
-    modeEl.addEventListener('change', applyFilters);
+    bracketEl.addEventListener('change', applyFilters);
     diffEl.addEventListener('change', applyFilters);
 
     renderTable(BEATMAPS);
