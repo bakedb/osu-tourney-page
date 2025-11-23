@@ -176,10 +176,10 @@
       font-size: 12px;
       color: #fff;
     }
-    .pill.osu { background: #4FC3F7; }
-    .pill.taiko { background: #81C784; }
-    .pill.ctb { background: #FBC02D; }
-    .pill.mania { background: #E57373; }
+    .pill.normal { background: #4FC3F7; }   /* light blue */
+    .pill.hard { background: #81C784; }     /* green */
+    .pill.insane { background: #FBC02D; }   /* yellow */
+    .pill.expert { background: #E57373; }   /* red */
 
     /* Rules */
     .rules li {
@@ -538,9 +538,10 @@
 
     function bracketPill(bracket) {
       const m = bracket.toLowerCase();
-      const className = ['osu','taiko','ctb','mania'].includes(m) ? m : 'osu';
+      const className = ['normal','hard','insane','expert'].includes(m) ? m : 'normal';
       return `<span class="pill ${className}">${bracket}</span>`;
     }
+
 
     function renderTable(rows) {
       tableBody.innerHTML = rows.map(r => `
