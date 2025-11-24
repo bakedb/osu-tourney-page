@@ -1,6 +1,8 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog, messagebox
 import math
+import json
+import os
 
 def get_diff_name(stars: float) -> str:
     if 0.0 <= stars <= 1.99:
@@ -17,6 +19,115 @@ def get_diff_name(stars: float) -> str:
         return "Expert+"
     else:
         return "Unknown"
+
+def load_beatmaps(file_path):
+    """Load beatmaps from JSON file"""
+    try:
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        else:
+            return []
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to load beatmaps: {e}")
+        return []
+
+def save_beatmaps(file_path, beatmaps):
+    """Save beatmaps to JSON file"""
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(beatmaps, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to save beatmaps: {e}")
+        return False
+
+def add_beatmap_to_json():
+    """Add current beatmap to beatmaps.json"""
+    title = title_entry.get().strip()
+    artist = artist_entry.get().strip()
+    bracket = mode_var.get()
+    length = length_entry.get().strip()
+    
+    # Validation
+    if not title or not artist or not bracket or not length:
+        messagebox.showerror("Error", "Please fill in all fields")
+        return
+    
+    if bracket == "Select...":
+        messagebox.showerror("Error", "Please select a bracket")
+        return
+    
+    try:
+        stars = float(stars_entry.get())
+        if stars < 0:
+            raise ValueError("Stars must be positive")
+    except ValueError:
+        messagebox.showerror("Error", "Please enter a valid star rating")
+        return
+    
+    # Create beatmap entry
+    diff_name = get_diff_name(stars)
+    diff_formatted = f"{diff_name} ({stars:.2f}★)"
+    
+    new_beatmap = {
+        "title": title,
+        "artist": artist,
+        "bracket": bracket,
+        "diff": diff_formatted,
+        "length": length
+    }
+    
+    # Load existing beatmaps
+    beatmaps = load_beatmaps("beatmaps.json")
+    
+    # Add new beatmap
+    beatmaps.append(new_beatmap)
+    
+    # Save updated beatmaps
+    if save_beatmaps("beatmaps.json", beatmaps):
+        messagebox.showinfo("Success", f"Added '{title}' to beatmaps.json")
+        # Clear form
+        title_entry.delete(0, tk.END)
+        artist_entry.delete(0, tk.END)
+        stars_entry.delete(0, tk.END)
+        length_entry.delete(0, tk.END)
+        mode_var.set("Select...")
+    else:
+        messagebox.showerror("Error", "Failed to save beatmap")
+
+def load_and_display_json():
+    """Load beatmaps.json and display in text widget"""
+    file_path = filedialog.askopenfilename(
+        title="Select beatmaps.json file",
+        filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+    )
+    
+    if file_path:
+        beatmaps = load_beatmaps(file_path)
+        if beatmaps:
+            # Display formatted JSON in output text
+            formatted_json = json.dumps(beatmaps, indent=2, ensure_ascii=False)
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, formatted_json)
+            messagebox.showinfo("Success", f"Loaded {len(beatmaps)} beatmaps")
+
+def save_current_as_json():
+    """Save current beatmaps.json to a new file"""
+    beatmaps = load_beatmaps("beatmaps.json")
+    if not beatmaps:
+        messagebox.showwarning("Warning", "No beatmaps found in beatmaps.json")
+        return
+    
+    file_path = filedialog.asksaveasfilename(
+        title="Save beatmaps as...",
+        defaultextension=".json",
+        filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+    )
+    
+    if file_path:
+        if save_beatmaps(file_path, beatmaps):
+            messagebox.showinfo("Success", f"Saved {len(beatmaps)} beatmaps to {file_path}")
 
 def format_song():
     title = title_entry.get()
@@ -77,7 +188,7 @@ artist_entry.grid(row=1, column=1)
 
 ttk.Label(formatter_frame, text="Bracket:").grid(row=2, column=0, sticky="w")
 mode_var = tk.StringVar(value="Select...")
-mode_menu = ttk.Combobox(formatter_frame, textvariable=mode_var, values=["normal", "hard", "insane", "expert"], state="readonly")
+mode_menu = ttk.Combobox(formatter_frame, textvariable=mode_var, values=["normal", "hard", "insane", "expert", "expert+", "expert++"], state="readonly")
 mode_menu.grid(row=2, column=1)
 
 ttk.Label(formatter_frame, text="Stars:").grid(row=3, column=0, sticky="w")
@@ -89,10 +200,23 @@ length_entry = ttk.Entry(formatter_frame, width=30)
 length_entry.grid(row=4, column=1)
 
 format_button = ttk.Button(formatter_frame, text="Format", command=format_song)
-format_button.grid(row=5, column=0, columnspan=2, pady=5)
+format_button.grid(row=5, column=0, pady=5)
 
-output_text = tk.Text(formatter_frame, height=3, width=60)
-output_text.grid(row=6, column=0, columnspan=2, pady=5)
+add_button = ttk.Button(formatter_frame, text="Add to beatmaps.json", command=add_beatmap_to_json)
+add_button.grid(row=5, column=1, pady=5)
+
+# JSON management buttons
+json_frame = ttk.Frame(formatter_frame)
+json_frame.grid(row=6, column=0, columnspan=2, pady=5)
+
+load_button = ttk.Button(json_frame, text="Load JSON", command=load_and_display_json)
+load_button.pack(side="left", padx=5)
+
+save_button = ttk.Button(json_frame, text="Save As...", command=save_current_as_json)
+save_button.pack(side="left", padx=5)
+
+output_text = tk.Text(formatter_frame, height=8, width=60)
+output_text.grid(row=7, column=0, columnspan=2, pady=5)
 
 # --- Section 2: Score Calculator ---
 score_frame = ttk.LabelFrame(root, text="Score Calculator")
