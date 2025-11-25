@@ -355,6 +355,39 @@
       color: var(--muted);
       font-size: 0.9rem;
     }
+
+    /* Tools section styles */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    
+    .row label {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    textarea.input {
+      resize: vertical;
+      min-height: 100px;
+    }
   </style>
 </head>
 <body>
@@ -371,6 +404,7 @@
       <button class="tab-btn" data-tab="live" role="tab" aria-controls="live">Live Scores</button>
       <button class="tab-btn" data-tab="rules" role="tab" aria-controls="rules">Rules</button>
       <button class="tab-btn" data-tab="beatmaps" role="tab" aria-controls="beatmaps">Beatmap list</button>
+      <button class="tab-btn" data-tab="tools" role="tab" aria-controls="tools">Tools</button>
     </div>
 
     <div class="userbox">
@@ -563,6 +597,98 @@
       </div>
     </section>
 
+    <!-- Tools -->
+    <section id="tools" role="tabpanel" aria-label="Tools" style="display: none;">
+      <div style="margin-top: 16px;" class="card">
+        <h3>Score Calculator</h3>
+        <div id="scoreCalculatorContent" style="display: block; margin-top: 16px;">
+          <div class="grid-2">
+            <div>
+              <div class="row">
+                <label for="toolAcc">Accuracy (to 4SF):</label>
+                <input id="toolAcc" class="input" type="number" step="0.01" placeholder="00.00" />
+              </div>
+              <div class="row">
+                <label for="toolCombo">Combo:</label>
+                <input id="toolCombo" class="input" type="number" placeholder="0" />
+              </div>
+              <div class="row">
+                <label for="toolMaxCombo">Max Combo:</label>
+                <input id="toolMaxCombo" class="input" type="number" placeholder="0" />
+              </div>
+              <div class="row">
+                <label for="toolMod">Mod:</label>
+                <select id="toolMod" class="select">
+                  <option value="None">None</option>
+                  <option value="EZ">Easy (EZ)</option>
+                  <option value="HR">Hard Rock (HR)</option>
+                  <option value="HD">Hidden (HD)</option>
+                  <option value="FL">Flashlight (FL)</option>
+                </select>
+              </div>
+              <button class="btn primary" id="calculateScoreBtn" style="margin-top: 12px;">Calculate Score</button>
+            </div>
+            <div>
+              <div class="card" style="background: #14141c; border: 1px solid #2a2a44;">
+                <h4>Result</h4>
+                <div id="scoreResult">Score: - | Scaled: -</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 16px;" class="card">
+        <h3>Song Formatter</h3>
+        <button class="btn" id="toggleSongFormatterBtn">Show Song Formatter</button>
+        <div id="songFormatterContent" style="display: none; margin-top: 16px;">
+          <div class="grid-2">
+            <div>
+              <div class="row">
+                <label for="toolTitle">Title:</label>
+                <input id="toolTitle" class="input" type="text" placeholder="Song title" />
+              </div>
+              <div class="row">
+                <label for="toolArtist">Artist:</label>
+                <input id="toolArtist" class="input" type="text" placeholder="Artist name" />
+              </div>
+              <div class="row">
+                <label for="toolBracket">Bracket:</label>
+                <select id="toolBracket" class="select">
+                  <option value="">Select bracket...</option>
+                  <option value="normal">normal</option>
+                  <option value="hard">hard</option>
+                  <option value="insane">insane</option>
+                  <option value="expert">expert</option>
+                  <option value="expert+">expert+</option>
+                  <option value="expert++">expert++</option>
+                </select>
+              </div>
+              <div class="row">
+                <label for="toolStars">Stars:</label>
+                <input id="toolStars" class="input" type="number" step="0.01" placeholder="Star rating" />
+              </div>
+              <div class="row">
+                <label for="toolLength">Length:</label>
+                <input id="toolLength" class="input" type="text" placeholder="e.g., 1:23" />
+              </div>
+              <div class="actions" style="margin-top: 12px;">
+                <button class="btn primary" id="formatSongBtn">Format</button>
+                <button class="btn" id="addToBeatmapsBtn">Add to beatmaps.json</button>
+              </div>
+            </div>
+            <div>
+              <div class="actions" style="margin-bottom: 12px;">
+                <button class="btn" id="loadJsonBtn">Load JSON</button>
+                <button class="btn" id="saveJsonBtn">Save As...</button>
+              </div>
+              <textarea id="toolOutput" class="input" style="height: 200px; font-family: monospace;" placeholder="Formatted output will appear here..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Beatmap list -->
     <section id="beatmaps" role="tabpanel" aria-label="Beatmap list" style="display: none;">
       <div class="card">
@@ -616,6 +742,15 @@
         <label for="password">Password</label>
         <input id="password" class="input" type="password" autocomplete="current-password" />
       </div>
+      <div class="row">
+        <label for="sessionDuration">Keep me logged in for...</label>
+        <select id="sessionDuration" class="select">
+          <option value="1">1 hour</option>
+          <option value="6">6 hours</option>
+          <option value="12">12 hours</option>
+          <option value="24">24 hours</option>
+        </select>
+      </div>
       <div class="error" id="signInError"></div>
       <div class="actions">
         <button class="btn" id="cancelSignIn">Cancel</button>
@@ -655,9 +790,10 @@
       return bytesToHex(digest);
     }
 
-    // Accounts: username -> sha256(password)
+    // Accounts: username -> { hash: sha256(password), role: user_role }
     const ACCOUNTS = {
-      "bakedb": "1d604998daff644540f1390636ee61e88f8d1b2a83e04521e494d48ca272a6bc",
+      "bakedb": { hash: "1d604998daff644540f1390636ee61e88f8d1b2a83e04521e494d48ca272a6bc", role: "Admin" },
+      "participant": { hash: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", role: "Participant" },
     };
 
     /* ------------------------------
@@ -669,7 +805,8 @@
       brackets: document.getElementById('brackets'),
       live: document.getElementById('live'),
       rules: document.getElementById('rules'),
-      beatmaps: document.getElementById('beatmaps')
+      beatmaps: document.getElementById('beatmaps'),
+      tools: document.getElementById('tools')
     };
     const userStatusEl = document.getElementById('userStatus');
     const signInBtn = document.getElementById('signInBtn');
@@ -680,19 +817,131 @@
     const signInErrorEl = document.getElementById('signInError');
     const usernameEl = document.getElementById('username');
     const passwordEl = document.getElementById('password');
+    const sessionDurationEl = document.getElementById('sessionDuration');
 
     let currentUser = null;
+    let currentUserRole = null;
+    let sessionExpiry = null;
 
     /* ------------------------------
-       Tab navigation
+       Session management
+       ------------------------------ */
+    function saveSession(user, role, hours) {
+      const expiryTime = Date.now() + (hours * 60 * 60 * 1000);
+      const sessionData = {
+        user,
+        role,
+        expiry: expiryTime
+      };
+      localStorage.setItem('userSession', JSON.stringify(sessionData));
+      sessionExpiry = expiryTime;
+    }
+
+    function loadSession() {
+      const sessionData = localStorage.getItem('userSession');
+      if (!sessionData) return false;
+
+      try {
+        const session = JSON.parse(sessionData);
+        if (Date.now() > session.expiry) {
+          clearSession();
+          return false;
+        }
+
+        currentUser = session.user;
+        currentUserRole = session.role;
+        sessionExpiry = session.expiry;
+        updateUserUI();
+        return true;
+      } catch (error) {
+        clearSession();
+        return false;
+      }
+    }
+
+    function clearSession() {
+      localStorage.removeItem('userSession');
+      currentUser = null;
+      currentUserRole = null;
+      sessionExpiry = null;
+    }
+
+    function updateUserUI() {
+      if (currentUser && currentUserRole) {
+        userStatusEl.textContent = `Signed in as ${currentUser} (${currentUserRole})`;
+        signInBtn.style.display = 'none';
+        signOutBtn.style.display = 'inline-block';
+      } else {
+        userStatusEl.textContent = 'Guest';
+        signInBtn.style.display = 'inline-block';
+        signOutBtn.style.display = 'none';
+      }
+    }
+
+    function checkSessionExpiry() {
+      if (sessionExpiry && Date.now() > sessionExpiry) {
+        clearSession();
+        updateUserUI();
+        updateToolsVisibility();
+      }
+    }
+
+    /* ------------------------------
+       Tab navigation with role-based access
        ------------------------------ */
     function showTab(name) {
+      // Check if user has permission to access this tab
+      if (name === 'tools' && !['Admin', 'Participant'].includes(currentUserRole)) {
+        signInErrorEl.textContent = 'Admin or Participant access required to view Tools.';
+        openModal();
+        return;
+      }
+      
       for (const t of tabs) t.classList.toggle('active', t.dataset.tab === name);
       for (const key of Object.keys(panels)) {
         panels[key].style.display = key === name ? 'block' : 'none';
       }
+      
+      // Update tools visibility based on role
+      if (name === 'tools') {
+        updateToolsVisibility();
+      }
+      
       // Update hash for deep linking
       location.hash = name;
+    }
+
+    // Update tools visibility based on user role
+    function updateToolsVisibility() {
+      const scoreCalculator = document.querySelector('#tools .card:first-child');
+      const songFormatter = document.querySelector('#tools .card:nth-child(2)');
+      const toggleSongFormatterBtn = document.getElementById('toggleSongFormatterBtn');
+      
+      if (currentUserRole === 'Admin') {
+        songFormatter.style.display = 'block';
+        scoreCalculator.style.display = 'block';
+        // Remove any access denied messages
+        const accessDenied = document.querySelector('#tools .access-denied');
+        if (accessDenied) {
+          accessDenied.remove();
+        }
+      } else {
+        songFormatter.style.display = 'none';
+        scoreCalculator.style.display = 'block';
+        
+        // Show access denied message for song formatter below the toggle button
+        if (!document.querySelector('#tools .access-denied')) {
+          const accessDenied = document.createElement('div');
+          accessDenied.className = 'card access-denied';
+          accessDenied.style.cssText = 'background: #2a1a1a; border-color: #ff4444; text-align: center; padding: 20px; margin-top: 16px;';
+          accessDenied.innerHTML = `
+            <h3 style="color: #ff4444; margin-bottom: 10px;">Access Restricted</h3>
+            <p style="color: var(--muted);">You need Admin privileges to access the Song Formatter.</p>
+            <p style="color: var(--muted); font-size: 0.9rem;">Please contact an administrator if you need access.</p>
+          `;
+          songFormatter.appendChild(accessDenied);
+        }
+      }
     }
 
     tabs.forEach(btn => {
@@ -707,8 +956,11 @@
       });
     });
 
+    // Initialize session on page load BEFORE setting up tabs
+    loadSession();
+
     // Initialize tab by hash
-    const initial = ['home', 'brackets', 'live', 'rules', 'beatmaps'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+    const initial = ['home', 'brackets', 'live', 'rules', 'beatmaps', 'tools'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
     showTab(initial);
 
     /* ------------------------------
@@ -749,16 +1001,25 @@
       }
 
       const inputHash = await sha256(pass);
-      if (inputHash !== ACCOUNTS[user]) {
+      if (inputHash !== ACCOUNTS[user].hash) {
         signInErrorEl.textContent = 'Incorrect password.';
         return;
       }
 
       currentUser = user;
-      userStatusEl.textContent = `Signed in as ${user}`;
-      signInBtn.style.display = 'none';
-      signOutBtn.style.display = 'inline-block';
+      currentUserRole = ACCOUNTS[user].role;
+      
+      // Save session with selected duration
+      const sessionHours = parseInt(sessionDurationEl.value);
+      saveSession(user, currentUserRole, sessionHours);
+      
+      updateUserUI();
       closeModal();
+      
+      // If user was trying to access tools and now has permission, show it
+      if (location.hash === '#tools' && ['Admin', 'Participant'].includes(currentUserRole)) {
+        showTab('tools');
+      }
     }
 
     confirmSignInBtn.addEventListener('click', handleSignIn);
@@ -767,10 +1028,15 @@
     });
 
     signOutBtn.addEventListener('click', () => {
-      currentUser = null;
-      userStatusEl.textContent = 'Guest';
-      signInBtn.style.display = 'inline-block';
-      signOutBtn.style.display = 'none';
+      clearSession();
+      updateUserUI();
+      updateToolsVisibility();
+      
+      // Remove access denied message if it exists
+      const accessDenied = document.querySelector('#tools .access-denied');
+      if (accessDenied) {
+        accessDenied.remove();
+      }
     });
 
     /* ------------------------------
@@ -1036,6 +1302,274 @@
     sortByEl.addEventListener('change', applyFilters);
 
     renderTable(BEATMAPS);
+
+    /* ------------------------------
+       Tools functionality
+       ------------------------------ */
+    
+    // Tool elements
+    const toolTitle = document.getElementById('toolTitle');
+    const toolArtist = document.getElementById('toolArtist');
+    const toolBracket = document.getElementById('toolBracket');
+    const toolStars = document.getElementById('toolStars');
+    const toolLength = document.getElementById('toolLength');
+    const toolOutput = document.getElementById('toolOutput');
+    const formatSongBtn = document.getElementById('formatSongBtn');
+    const addToBeatmapsBtn = document.getElementById('addToBeatmapsBtn');
+    const loadJsonBtn = document.getElementById('loadJsonBtn');
+    const saveJsonBtn = document.getElementById('saveJsonBtn');
+    
+    const toolAcc = document.getElementById('toolAcc');
+    const toolCombo = document.getElementById('toolCombo');
+    const toolMaxCombo = document.getElementById('toolMaxCombo');
+    const toolMod = document.getElementById('toolMod');
+    const calculateScoreBtn = document.getElementById('calculateScoreBtn');
+    const scoreResult = document.getElementById('scoreResult');
+
+    // Get difficulty name from star rating
+    function getDiffName(stars) {
+      if (0.0 <= stars <= 1.99) return "Easy";
+      else if (2.0 <= stars <= 2.69) return "Normal";
+      else if (2.7 <= stars <= 3.99) return "Hard";
+      else if (4.0 <= stars <= 5.29) return "Insane";
+      else if (5.3 <= stars <= 6.49) return "Expert";
+      else if (stars >= 6.5) return "Expert+";
+      else return "Unknown";
+    }
+
+    // Sort beatmaps by bracket
+    function sortBeatmapsByBracket(beatmaps) {
+      const bracketOrder = ["normal", "hard", "insane", "expert", "expert+", "expert++"];
+      
+      return beatmaps.sort((a, b) => {
+        const aIndex = bracketOrder.indexOf(a.bracket.toLowerCase());
+        const bIndex = bracketOrder.indexOf(b.bracket.toLowerCase());
+        const aSort = aIndex === -1 ? bracketOrder.length : aIndex;
+        const bSort = bIndex === -1 ? bracketOrder.length : bIndex;
+        return aSort - bSort;
+      });
+    }
+
+    // Format song data
+    function formatSong() {
+      const title = toolTitle.value.trim();
+      const artist = toolArtist.value.trim();
+      const bracket = toolBracket.value;
+      const length = toolLength.value.trim();
+      
+      if (!title || !artist || !bracket || !length) {
+        toolOutput.value = 'Error: Please fill in all fields';
+        return;
+      }
+      
+      if (bracket === "") {
+        toolOutput.value = 'Error: Please select a bracket';
+        return;
+      }
+      
+      const stars = parseFloat(toolStars.value);
+      if (isNaN(stars) || stars < 0) {
+        toolOutput.value = 'Error: Please enter a valid star rating';
+        return;
+      }
+      
+      const diffName = getDiffName(stars);
+      const diffFormatted = `${diffName} (${stars.toFixed(2)}★)`;
+      
+      const formatted = `{ title: "${title}", artist: "${artist}", bracket: "${bracket}", diff: "${diffFormatted}", length: "${length}" },`;
+      toolOutput.value = formatted;
+    }
+
+    // Add beatmap to beatmaps.json (simulated - in real implementation would require server-side)
+    async function addBeatmapToJson() {
+      const title = toolTitle.value.trim();
+      const artist = toolArtist.value.trim();
+      const bracket = toolBracket.value;
+      const length = toolLength.value.trim();
+      
+      if (!title || !artist || !bracket || !length) {
+        alert('Error: Please fill in all fields');
+        return;
+      }
+      
+      if (bracket === "") {
+        alert('Error: Please select a bracket');
+        return;
+      }
+      
+      const stars = parseFloat(toolStars.value);
+      if (isNaN(stars) || stars < 0) {
+        alert('Error: Please enter a valid star rating');
+        return;
+      }
+      
+      const diffName = getDiffName(stars);
+      const diffFormatted = `${diffName} (${stars.toFixed(2)}★)`;
+      
+      const newBeatmap = {
+        title,
+        artist,
+        bracket,
+        diff: diffFormatted,
+        length
+      };
+      
+      try {
+        // Load existing beatmaps
+        let beatmaps = [];
+        try {
+          const response = await fetch('beatmaps.json');
+          beatmaps = await response.json();
+        } catch (e) {
+          console.warn('beatmaps.json not found, creating new');
+        }
+        
+        // Add new beatmap
+        beatmaps.push(newBeatmap);
+        
+        // Sort and save (in real implementation would need server-side)
+        const sortedBeatmaps = sortBeatmapsByBracket(beatmaps);
+        toolOutput.value = JSON.stringify(sortedBeatmaps, null, 2);
+        
+        // Clear form
+        toolTitle.value = '';
+        toolArtist.value = '';
+        toolStars.value = '';
+        toolLength.value = '';
+        toolBracket.value = '';
+        
+        alert(`Added '${title}' to beatmaps.json (displayed in output area - would need server-side to actually save)`);
+        
+        // Refresh beatmap table if it exists
+        if (BEATMAPS.length >= 0) {
+          loadBeatmapData();
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    // Load JSON file (simulated - browser security restrictions)
+    function loadJsonFile() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          try {
+            const text = await file.text();
+            const beatmaps = JSON.parse(text);
+            const sortedBeatmaps = sortBeatmapsByBracket(beatmaps);
+            toolOutput.value = JSON.stringify(sortedBeatmaps, null, 2);
+            alert(`Loaded and sorted ${beatmaps.length} beatmaps`);
+          } catch (error) {
+            alert('Error loading JSON: ' + error.message);
+          }
+        }
+      };
+      input.click();
+    }
+
+    // Save JSON file
+    function saveJsonFile() {
+      const content = toolOutput.value.trim();
+      if (!content) {
+        alert('No content to save');
+        return;
+      }
+      
+      try {
+        JSON.parse(content); // Validate JSON
+        
+        const blob = new Blob([content], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'beatmaps.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        alert('Invalid JSON format: ' + error.message);
+      }
+    }
+
+    // Format scaled score with apostrophe separators
+    function formatScaledScore(score) {
+      const scaledScore = Math.floor(score);
+      return scaledScore.toLocaleString('en-US').replace(/,/g, "'");
+    }
+
+    // Calculate score
+    function calculateScore() {
+      try {
+        const acc = parseFloat(toolAcc.value);
+        const combo = parseInt(toolCombo.value);
+        const maxCombo = parseInt(toolMaxCombo.value);
+        
+        if (isNaN(acc) || isNaN(combo) || isNaN(maxCombo)) {
+          scoreResult.textContent = 'Error: Please enter valid numbers';
+          return;
+        }
+        
+        if (maxCombo === 0) {
+          scoreResult.textContent = 'Error: Max combo cannot be zero';
+          return;
+        }
+        
+        // Base formula
+        let score = ((0.8 * acc) * 100) + ((0.2 * Math.sqrt(combo / maxCombo)) * 100);
+        
+        // Apply mod multiplier
+        const mod = toolMod.value;
+        const multipliers = {
+          "None": 1.0,
+          "EZ": 0.50,
+          "HR": 1.12,
+          "HD": 1.05,
+          "FL": 1.10
+        };
+        score *= multipliers[mod] || 1.0;
+        
+        // Calculate scaled score (8020 = 1,000,000 ratio)
+        const scaledScore = (score / 8020.0) * 1000000;
+        const formattedScaled = formatScaledScore(scaledScore);
+        
+        scoreResult.textContent = `Score: ${score.toFixed(2)} | Scaled: ${formattedScaled}`;
+      } catch (error) {
+        scoreResult.textContent = `Error: ${error.message}`;
+      }
+    }
+
+    // Tool event listeners
+    formatSongBtn.addEventListener('click', formatSong);
+    addToBeatmapsBtn.addEventListener('click', addBeatmapToJson);
+    loadJsonBtn.addEventListener('click', loadJsonFile);
+    saveJsonBtn.addEventListener('click', saveJsonFile);
+    calculateScoreBtn.addEventListener('click', calculateScore);
+    
+    // Toggle song formatter visibility
+    const toggleSongFormatterBtn = document.getElementById('toggleSongFormatterBtn');
+    const songFormatterContent = document.getElementById('songFormatterContent');
+    
+    toggleSongFormatterBtn.addEventListener('click', () => {
+      const isVisible = songFormatterContent.style.display !== 'none';
+      songFormatterContent.style.display = isVisible ? 'none' : 'block';
+      toggleSongFormatterBtn.textContent = isVisible ? 'Show Song Formatter' : 'Hide Song Formatter';
+    });
+
+    // Add Enter key support for score calculator
+    [toolAcc, toolCombo, toolMaxCombo, toolMod].forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') calculateScore();
+      });
+    });
+
+    // Initialize session on page load
+    loadSession();
+    
+    // Check session expiry periodically
+    setInterval(checkSessionExpiry, 60000); // Check every minute
   </script>
 </body>
 </html>
