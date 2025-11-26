@@ -726,6 +726,14 @@
         0 6px 20px rgba(0, 180, 216, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.4);
     }
+
+    /* Admin-only tab hiding with maximum specificity */
+    .tab-btn.admin-only {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   </style>
 </head>
 <body>
@@ -1148,10 +1156,90 @@
     }
 
     // Accounts: username -> { hash: sha256(password), role: user_role }
-    const ACCOUNTS = {
-      "bakedb": { hash: "1d604998daff644540f1390636ee61e88f8d1b2a83e04521e494d48ca272a6bc", role: "Admin" },
-      "participant": { hash: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", role: "Participant" },
-    };
+    let ACCOUNTS = {};
+
+    // Load accounts from Google Sheets
+    async function loadAccountsFromGoogleSheets() {
+      try {
+        const googleSheetsId = '1gwlmCixsyiyhzVzaXNGJaHyZwC5bbrVST24f1akTQI4'; // Replace with your Google Sheets ID
+        const url = `https://docs.google.com/spreadsheets/d/${googleSheetsId}/gviz/tq?tqx=out:json&gid=0`;
+        
+        console.log('Attempting to load from:', url);
+        
+        // Use CORS proxy if needed, or try direct fetch first
+        let response;
+        try {
+          response = await fetch(url);
+        } catch (corsError) {
+          console.log('Direct fetch failed, trying CORS proxy...');
+          // Try a CORS proxy as fallback
+          const proxyUrl = `https://cors-anywhere.herokuapp.com/${url}`;
+          response = await fetch(proxyUrl);
+        }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const text = await response.text();
+        console.log('Full raw response length:', text.length);
+        console.log('Raw response (first 500 chars):', text.substring(0, 500));
+        console.log('Raw response (last 500 chars):', text.substring(text.length - 500));
+        
+        // Check if response contains data
+        if (text.includes('google.visualization.Query.setResponse')) {
+          // Parse the response
+          const jsonStart = text.indexOf('{');
+          const jsonEnd = text.lastIndexOf('}');
+          const jsonString = text.substring(jsonStart, jsonEnd + 1);
+          
+          const data = JSON.parse(jsonString);
+          
+          // Convert sheet data to ACCOUNTS object
+          ACCOUNTS = {};
+          if (data.table && data.table.rows) {
+            data.table.rows.forEach((row, index) => { // Process all rows
+              if (row.c && row.c.length >= 3) {
+                const username = row.c[0]?.v || '';
+                const passwordHash = row.c[1]?.v || '';
+                const role = row.c[2]?.v || '';
+                
+                if (username && passwordHash && role) {
+                  ACCOUNTS[username] = { hash: passwordHash, role: role };
+                }
+              }
+            });
+          } else {
+            console.log('No table data found in response');
+          }
+        } else {
+          console.log('Response does not contain expected Google Sheets data');
+          console.log('Full response:', text);
+        }
+      } catch (error) {
+        console.error('Failed to load accounts from Google Sheets:', error);
+        console.log('This usually means:');
+        console.log('1. The sheet is not published as "Web page"');
+        console.log('2. The sheet is not set to "Anyone with link can view"');
+        console.log('3. The sheet ID is incorrect');
+        console.log('4. CORS issues (try opening the sheet URL directly in browser)');
+        
+        // Fallback to hardcoded accounts if Google Sheets fails
+        ACCOUNTS = {
+          "admin": { hash: "1d604998daff644540f1390636ee61e88f8d1b2a83e04521e494d48ca272a6bc", role: "Admin" },
+          "participant": { hash: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", role: "Participant" },
+        };
+      }
+    }
+    
+    // Load accounts on page load (only once)
+    let accountsLoaded = false;
+    (async () => {
+      if (!accountsLoaded) {
+        accountsLoaded = true;
+        await loadAccountsFromGoogleSheets();
+      }
+    })();
 
     /* ------------------------------
        State & elements
@@ -1268,6 +1356,50 @@
         signInBtn.style.display = 'inline-block';
         signOutBtn.style.display = 'none';
       }
+      
+      // Update tab visibility based on role
+      updateTabVisibility();
+    }
+
+    function updateTabVisibility() {
+      const bracketsTab = document.querySelector('[data-tab="brackets"]');
+      const liveTab = document.querySelector('[data-tab="live"]');
+      
+      // Debug: log current state
+      console.log('updateTabVisibility called. currentUserRole:', currentUserRole);
+      console.log('bracketsTab:', bracketsTab);
+      console.log('liveTab:', liveTab);
+      
+      // Show/hide tabs based on Admin role
+      const isAdmin = currentUserRole === 'Admin';
+      
+      if (bracketsTab) {
+        if (isAdmin) {
+          bracketsTab.classList.remove('admin-only');
+          bracketsTab.style.display = '';
+        } else {
+          bracketsTab.classList.add('admin-only');
+          bracketsTab.style.display = 'none';
+        }
+        console.log('bracketsTab display set to:', bracketsTab.style.display);
+      }
+      
+      if (liveTab) {
+        if (isAdmin) {
+          liveTab.classList.remove('admin-only');
+          liveTab.style.display = '';
+        } else {
+          liveTab.classList.add('admin-only');
+          liveTab.style.display = 'none';
+        }
+        console.log('liveTab display set to:', liveTab.style.display);
+      }
+      
+      // If current tab is hidden, switch to Home
+      const currentTab = document.querySelector('.tab-btn.active');
+      if (currentTab && currentTab.style.display === 'none') {
+        showTab('home');
+      }
     }
 
     function checkSessionExpiry() {
@@ -1285,6 +1417,13 @@
       // Check if user has permission to access this tab
       if (name === 'tools' && !['Admin', 'Participant'].includes(currentUserRole)) {
         signInErrorEl.textContent = 'Admin or Participant access required to view Tools.';
+        openModal();
+        return;
+      }
+      
+      // Check if user has permission to access Brackets or Live Scores tabs
+      if ((name === 'brackets' || name === 'live') && currentUserRole !== 'Admin') {
+        signInErrorEl.textContent = 'Admin access required to view this tab.';
         openModal();
         return;
       }
@@ -1327,6 +1466,9 @@
     // Initialize theme on page load
     loadTheme();
 
+    // Initialize tab visibility based on current user role
+    updateTabVisibility();
+
     // Initialize tab by hash
     const initial = ['home', 'brackets', 'live', 'rules', 'beatmaps', 'tools'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
     showTab(initial);
@@ -1362,6 +1504,8 @@
         signInErrorEl.textContent = 'Please enter both username and password.';
         return;
       }
+
+      // Accounts are already loaded on page load
 
       if (!ACCOUNTS[user]) {
         signInErrorEl.textContent = 'Unknown username.';
@@ -1399,6 +1543,7 @@
       clearSession();
       updateUserUI();
       updateToolsVisibility();
+      updateTabVisibility();
       
       // Remove access denied message if it exists
       const accessDenied = document.querySelector('#tools .access-denied');
@@ -1412,23 +1557,117 @@
        ------------------------------ */
     let tournamentData = null;
 
-    // Load tournament data from JSON file
+    // Load tournament data from Google Sheets
     async function loadTournamentData() {
       try {
-        const response = await fetch('tournament-data.json');
-        tournamentData = await response.json();
+        // Try loading from Google Sheets first
+        await loadBracketsFromGoogleSheets();
+        await loadLiveScoresFromGoogleSheets();
         updateTournamentDisplays();
       } catch (error) {
-        console.error('Failed to load tournament data:', error);
-        // Use fallback data for demo
-        tournamentData = {
-          tournament: { name: "osu! Tournament 2025", status: "ongoing", currentRound: "semifinals" },
-          participants: [],
-          brackets: { semifinals: [], finals: [], thirdPlace: [] },
-          liveMatches: [],
-          recentResults: []
-        };
-        updateTournamentDisplays();
+        console.error('Failed to load tournament data from Google Sheets:', error);
+        // Fallback to JSON file
+        try {
+          const response = await fetch('tournament-data.json');
+          tournamentData = await response.json();
+          updateTournamentDisplays();
+        } catch (jsonError) {
+          console.error('Failed to load tournament data from JSON:', jsonError);
+          // Use fallback data for demo
+          tournamentData = {
+            tournament: { name: "osu! Tournament 2025", status: "ongoing", currentRound: "semifinals" },
+            participants: [],
+            brackets: { semifinals: [], finals: [], thirdPlace: [] },
+            liveMatches: [],
+            recentResults: []
+          };
+          updateTournamentDisplays();
+        }
+      }
+    }
+
+    // Load brackets data from Google Sheets (Tab 2)
+    async function loadBracketsFromGoogleSheets() {
+      const googleSheetsId = '1gwlmCixsyiyhzVzaXNGJaHyZwC5bbrVST24f1akTQI4';
+      const url = `https://docs.google.com/spreadsheets/d/${googleSheetsId}/gviz/tq?tqx=out:json&gid=1`; // Tab 2
+      
+      const response = await fetch(url);
+      const text = await response.text();
+      
+      if (text.includes('google.visualization.Query.setResponse')) {
+        const jsonStart = text.indexOf('{');
+        const jsonEnd = text.lastIndexOf('}');
+        const data = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+        
+        if (!tournamentData) tournamentData = { brackets: {} };
+        
+        if (data.table && data.table.rows) {
+          tournamentData.brackets = {};
+          
+          data.table.rows.forEach((row, index) => {
+            if (row.c && row.c.length >= 4) {
+              const round = row.c[0]?.v || '';
+              const player1 = row.c[1]?.v || '';
+              const player2 = row.c[2]?.v || '';
+              const status = row.c[3]?.v || '';
+              
+              if (round && player1 && player2) {
+                if (!tournamentData.brackets[round]) {
+                  tournamentData.brackets[round] = [];
+                }
+                
+                tournamentData.brackets[round].push({
+                  player1: { name: player1, id: player1.toLowerCase().replace(/\s+/g, ''), team: '' },
+                  player2: { name: player2, id: player2.toLowerCase().replace(/\s+/g, ''), team: '' },
+                  status: status || 'upcoming',
+                  winner: null,
+                  score: { player1: 0, player2: 0 }
+                });
+              }
+            }
+          });
+        }
+      }
+    }
+
+    // Load live scores data from Google Sheets (Tab 3)
+    async function loadLiveScoresFromGoogleSheets() {
+      const googleSheetsId = '1gwlmCixsyiyhzVzaXNGJaHyZwC5bbrVST24f1akTQI4';
+      const url = `https://docs.google.com/spreadsheets/d/${googleSheetsId}/gviz/tq?tqx=out:json&gid=2`; // Tab 3
+      
+      const response = await fetch(url);
+      const text = await response.text();
+      
+      if (text.includes('google.visualization.Query.setResponse')) {
+        const jsonStart = text.indexOf('{');
+        const jsonEnd = text.lastIndexOf('}');
+        const data = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+        
+        if (!tournamentData) tournamentData = { liveMatches: [] };
+        
+        if (data.table && data.table.rows) {
+          tournamentData.liveMatches = [];
+          
+          data.table.rows.forEach((row, index) => {
+            if (row.c && row.c.length >= 5) {
+              const player1 = row.c[0]?.v || '';
+              const player2 = row.c[1]?.v || '';
+              const score1 = parseInt(row.c[2]?.v) || 0;
+              const score2 = parseInt(row.c[3]?.v) || 0;
+              const currentMap = parseInt(row.c[4]?.v) || 1;
+              
+              if (player1 && player2) {
+                tournamentData.liveMatches.push({
+                  player1: { name: player1, team: '' },
+                  player2: { name: player2, team: '' },
+                  score: { player1: score1, player2: score2 },
+                  currentMap: currentMap,
+                  maps: []
+                });
+              }
+            }
+          });
+        }
       }
     }
 
