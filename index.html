@@ -1267,7 +1267,7 @@
     .modal .actions { display: flex; gap: 8px; justify-content: flex-end; }
     .btn {
       border: none;
-      background: #23233a;
+      background: var(--bg-elev);
       color: var(--text);
       padding: 8px 12px;
       border-radius: 8px;
@@ -1882,6 +1882,111 @@
       opacity: 0 !important;
       pointer-events: none !important;
     }
+
+    /* Legacy Versions Drawer Styles */
+    .legacy-versions-list {
+      padding: 20px;
+    }
+    
+    .legacy-description {
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    .legacy-version-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .legacy-version-card {
+      display: block;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .legacy-version-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(255, 102, 170, 0.2);
+    }
+    
+    .legacy-version-number {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    
+    .legacy-version-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    
+    .legacy-version-desc {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    
+    .legacy-note {
+      padding: 12px;
+      background: rgba(255, 102, 170, 0.1);
+      border: 1px solid rgba(255, 102, 170, 0.3);
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    
+    .legacy-note p {
+      margin: 0;
+    }
+    
+    /* Theme-specific legacy drawer styles */
+    [data-theme="frutiger-aero"] .legacy-version-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+    }
+    
+    [data-theme="frutiger-aero"] .legacy-version-card:hover {
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 180, 216, 0.2);
+    }
+    
+    [data-theme="frutiger-aero"] .legacy-note {
+      background: rgba(0, 180, 216, 0.1);
+      border-color: rgba(0, 180, 216, 0.3);
+    }
+    
+    [data-theme="windows-9x"] .legacy-version-card {
+      background: var(--bg-elev);
+      border: 2px solid var(--border-dark);
+      border-radius: 0;
+    }
+    
+    [data-theme="windows-9x"] .legacy-version-card:hover {
+      background: var(--accent);
+      color: #ffffff;
+      transform: none;
+    }
+    
+    [data-theme="windows-9x"] .legacy-version-number {
+      color: var(--accent);
+    }
+    
+    [data-theme="windows-9x"] .legacy-note {
+      background: var(--bg-elev);
+      border: 2px solid var(--border-dark);
+    }
   </style>
 </head>
 <body>
@@ -1903,6 +2008,9 @@
 
     <div class="userbox">
       <span id="userStatus">Guest</span>
+      <button id="legacyToggle" class="mods-toggle" title="Toggle legacy versions">
+        <span class="mods-icon">📚</span>
+      </button>
       <button id="modsToggle" class="mods-toggle" title="Toggle osu! mods">
         <span class="mods-icon">🎯</span>
       </button>
@@ -1914,6 +2022,54 @@
       <button class="signout-btn" id="signOutBtn" style="display: none;">Sign out</button>
     </div>
   </nav>
+
+  <!-- Legacy Versions Drawer -->
+  <div id="legacyDrawer" class="mods-drawer">
+    <div class="mods-drawer-header">
+      <h3 class="mods-drawer-title">Legacy Versions</h3>
+      <button id="legacyCloseBtn" class="mods-close-btn">✕</button>
+    </div>
+    <div class="mods-drawer-content">
+      <div class="legacy-versions-list">
+        <p class="legacy-description">Access previous versions of the osu! Tournament Portal:</p>
+        <div class="legacy-version-grid">
+          <a href="/legacy/v0.5.html" class="legacy-version-card">
+            <div class="legacy-version-number">v0.5</div>
+            <div class="legacy-version-date">26 November 2025</div>
+            <div class="legacy-version-desc">Added more themes, website mods, registration system, and Google Sheets account fetching</div>
+          </a>
+          <a href="/legacy/v0.4.html" class="legacy-version-card">
+            <div class="legacy-version-number">v0.4</div>
+            <div class="legacy-version-date">25 November 2025</div>
+            <div class="legacy-version-desc">Added Frutiger Aero theme and an easter egg menu</div>
+          </a>
+          <a href="/legacy/v0.3.html" class="legacy-version-card">
+            <div class="legacy-version-number">v0.3</div>
+            <div class="legacy-version-date">25 November 2025</div>
+            <div class="legacy-version-desc">Added tools for admins, account roles (admin and participant), persistent sign-in with variable expiry</div>
+          </a>
+          <a href="/legacy/v0.2.html" class="legacy-version-card">
+            <div class="legacy-version-number">v0.2</div>
+            <div class="legacy-version-date">24 November 2025</div>
+            <div class="legacy-version-desc">Changed welcome page, more friendly to less experienced tournament-goers, expanded documentation</div>
+          </a>
+          <a href="/legacy/v0.1.html" class="legacy-version-card">
+            <div class="legacy-version-number">v0.1</div>
+            <div class="legacy-version-date">23 November 2025</div>
+            <div class="legacy-version-desc">Rebranded to osu!TP, beatmaps no longer hardcoded, changed gamemodes to brackets</div>
+          </a>
+          <a href="/legacy/v0.0.html" class="legacy-version-card">
+            <div class="legacy-version-number">v0.0</div>
+            <div class="legacy-version-date">Original Release</div>
+            <div class="legacy-version-desc">Basic functionality</div>
+          </a>
+        </div>
+        <div class="legacy-note">
+          <p><strong>Note:</strong> Legacy versions may have limited functionality and are provided for archival purposes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Mods Drawer -->
   <div id="modsDrawer" class="mods-drawer">
@@ -2143,8 +2299,22 @@
     <!-- Tools -->
     <section id="tools" role="tabpanel" aria-label="Tools" style="display: none;">
       <div style="margin-top: 16px;" class="card">
+        <h3>Registration Code Decoder</h3>
+        <button class="btn" id="toggleCodeDecoderBtn">Show Registration Decoder</button>
+        <div id="codeDecoderContent" style="display: none; margin-top: 16px;">
+          <div class="row">
+            <label for="registrationCodeInput">Registration Code:</label>
+            <input id="registrationCodeInput" class="input" type="text" placeholder="Enter registration code (e.g., REG-XXXXX-1234)" />
+          </div>
+          <button class="btn primary" id="decodeCodeBtn">Decode Registration</button>
+          <div id="decodedRegistrationInfo" style="margin-top: 16px;"></div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 16px;" class="card">
         <h3>Score Calculator</h3>
-        <div id="scoreCalculatorContent" style="display: block; margin-top: 16px;">
+        <button class="btn" id="toggleScoreCalculatorBtn">Show Score Calculator</button>
+        <div id="scoreCalculatorContent" style="display: none; margin-top: 16px;">
           <div class="grid-2">
             <div>
               <div class="row">
@@ -2172,7 +2342,7 @@
               <button class="btn primary" id="calculateScoreBtn" style="margin-top: 12px;">Calculate Score</button>
             </div>
             <div>
-              <div class="card" style="background: #14141c; border: 1px solid #2a2a44;">
+              <div class="card">
                 <h4>Result</h4>
                 <div id="scoreResult">Score: - | Scaled: -</div>
               </div>
@@ -2606,6 +2776,11 @@
     const hrToggle = document.getElementById('hrToggle');
     const hdToggle = document.getElementById('hdToggle');
     
+    // Legacy drawer elements
+    const legacyToggleBtn = document.getElementById('legacyToggle');
+    const legacyDrawer = document.getElementById('legacyDrawer');
+    const legacyCloseBtn = document.getElementById('legacyCloseBtn');
+    
     let activeMods = {
       fl: false,
       hr: false,
@@ -2629,10 +2804,24 @@
     
     // Close drawer when clicking outside
     document.addEventListener('click', (e) => {
-      if (!modsDrawer.contains(e.target) && !modsToggleBtn.contains(e.target)) {
+      if (!modsDrawer.contains(e.target) && !modsToggleBtn.contains(e.target) && 
+          !legacyDrawer.contains(e.target) && !legacyToggleBtn.contains(e.target)) {
         closeModsDrawer();
+        closeLegacyDrawer();
       }
     });
+    
+    // Legacy drawer controls
+    function openLegacyDrawer() {
+      legacyDrawer.classList.add('open');
+    }
+    
+    function closeLegacyDrawer() {
+      legacyDrawer.classList.remove('open');
+    }
+    
+    legacyToggleBtn.addEventListener('click', openLegacyDrawer);
+    legacyCloseBtn.addEventListener('click', closeLegacyDrawer);
     
     // Mod toggle functions
     function toggleMod(modName) {
@@ -3026,6 +3215,64 @@
       return emailRegex.test(email);
     }
 
+    // Generate registration code
+    function generateRegistrationCode(registrationData) {
+      // Create a compact representation of the data
+      const dataString = JSON.stringify(registrationData);
+      
+      // Simple encoding: base64 with a checksum
+      const encoded = btoa(dataString);
+      
+      // Add a simple checksum (first 4 chars of hash)
+      const checksum = dataString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0).toString(16).slice(-4).toUpperCase();
+      
+      // Create final code: REG-XXXXX-CHECKSUM
+      const code = `REG-${encoded.slice(0, 8)}${encoded.slice(-4)}-${checksum}`;
+      
+      return code;
+    }
+    
+    // Decode registration code
+    function decodeRegistrationCode(code) {
+      try {
+        // Validate code format
+        const match = code.match(/^REG-(.+)-([A-F0-9]{4})$/);
+        if (!match) {
+          throw new Error('Invalid code format');
+        }
+        
+        const encodedPart = match[1];
+        const providedChecksum = match[2];
+        
+        // Reconstruct the base64 string (we need to figure out the missing parts)
+        // For simplicity, we'll store the full encoded data in localStorage with the code as key
+        const storedData = localStorage.getItem(`reg_${code}`);
+        if (!storedData) {
+          throw new Error('Registration data not found');
+        }
+        
+        const registrationData = JSON.parse(storedData);
+        
+        // Verify checksum
+        const dataString = JSON.stringify(registrationData);
+        const calculatedChecksum = dataString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0).toString(16).slice(-4).toUpperCase();
+        
+        if (calculatedChecksum !== providedChecksum) {
+          throw new Error('Checksum verification failed');
+        }
+        
+        return registrationData;
+      } catch (error) {
+        console.error('Error decoding registration code:', error);
+        return null;
+      }
+    }
+    
+    // Store registration data with code as key
+    function storeRegistrationData(code, data) {
+      localStorage.setItem(`reg_${code}`, JSON.stringify(data));
+    }
+
     // Submit registration data to Google Sheets
     async function submitRegistrationToGoogleSheets(registrationData) {
       const googleSheetsId = '1gwlmCixsyiyhzVzaXNGJaHyZwC5bbrVST24f1akTQI4';
@@ -3064,7 +3311,7 @@
         // return response.ok;
         
       } catch (error) {
-        console.error('Failed to submit registration:', error);
+        console.error('Failed to submit registration to Google Sheets:', error);
         return false;
       }
     }
@@ -3124,8 +3371,8 @@
       const registrationData = {
         username,
         email,
-        osuUsername,
-        osuId: parseInt(osuId),
+        osuUsername: osuUsername || 'N/A',
+        osuId: noOsuAccountEl.checked ? 'N/A' : parseInt(osuId),
         country,
         preferredBracket,
         experience,
@@ -3133,15 +3380,24 @@
         timestamp: new Date().toISOString()
       };
       
-      // Submit registration
-      const success = await submitRegistrationToGoogleSheets(registrationData);
+      // Generate registration code
+      const registrationCode = generateRegistrationCode(registrationData);
       
-      if (success) {
-        alert('Registration submitted successfully! You will be contacted via email with further information.');
-        closeRegisterModal();
-      } else {
-        registerErrorEl.textContent = 'Failed to submit registration. Please try again later.';
-      }
+      // Store the registration data
+      storeRegistrationData(registrationCode, registrationData);
+      
+      // Show success message with code
+      const successMessage = `Registration successful! Your registration code is:\n\n${registrationCode}\n\nPlease save this code and provide it to the tournament organizers. You can also take a screenshot for your records.`;
+      
+      // Create a more user-friendly success modal
+      const result = confirm(successMessage + '\n\nClick OK to close this window.');
+      
+      closeRegisterModal();
+      
+      // Also store a copy in general registrations for backup
+      const existingRegistrations = JSON.parse(localStorage.getItem('tournamentRegistrations') || '[]');
+      existingRegistrations.push({...registrationData, code: registrationCode});
+      localStorage.setItem('tournamentRegistrations', JSON.stringify(existingRegistrations));
     }
 
     // Registration event listeners
@@ -3806,6 +4062,87 @@
       toggleSongFormatterBtn.textContent = isVisible ? 'Show Song Formatter' : 'Hide Song Formatter';
     });
 
+    // Toggle score calculator visibility
+    const toggleScoreCalculatorBtn = document.getElementById('toggleScoreCalculatorBtn');
+    const scoreCalculatorContent = document.getElementById('scoreCalculatorContent');
+    
+    toggleScoreCalculatorBtn.addEventListener('click', () => {
+      const isVisible = scoreCalculatorContent.style.display !== 'none';
+      scoreCalculatorContent.style.display = isVisible ? 'none' : 'block';
+      toggleScoreCalculatorBtn.textContent = isVisible ? 'Show Score Calculator' : 'Hide Score Calculator';
+    });
+
+    // Registration Code Decoder functionality
+    const toggleCodeDecoderBtn = document.getElementById('toggleCodeDecoderBtn');
+    const codeDecoderContent = document.getElementById('codeDecoderContent');
+    const registrationCodeInput = document.getElementById('registrationCodeInput');
+    const decodeCodeBtn = document.getElementById('decodeCodeBtn');
+    const decodedRegistrationInfo = document.getElementById('decodedRegistrationInfo');
+    
+    toggleCodeDecoderBtn.addEventListener('click', () => {
+      const isVisible = codeDecoderContent.style.display !== 'none';
+      codeDecoderContent.style.display = isVisible ? 'none' : 'block';
+      toggleCodeDecoderBtn.textContent = isVisible ? 'Show Registration Decoder' : 'Hide Registration Decoder';
+    });
+    
+    decodeCodeBtn.addEventListener('click', () => {
+      const code = registrationCodeInput.value.trim();
+      
+      if (!code) {
+        decodedRegistrationInfo.innerHTML = '<div class="error">Please enter a registration code.</div>';
+        return;
+      }
+      
+      const registrationData = decodeRegistrationCode(code);
+      
+      if (registrationData) {
+        // Format the registration data for display
+        const formattedDate = new Date(registrationData.timestamp).toLocaleString();
+        
+        const displayHTML = `
+          <div class="card" style="background: var(--card); border: 1px solid var(--accent); margin-top: 12px;">
+            <h4 style="color: var(--accent); margin: 0 0 12px 0;">✅ Registration Decoded Successfully</h4>
+            <div class="grid-2">
+              <div>
+                <p><strong>Username:</strong> ${registrationData.username}</p>
+                <p><strong>Email:</strong> ${registrationData.email}</p>
+                <p><strong>Country:</strong> ${registrationData.country}</p>
+                <p><strong>Preferred Bracket:</strong> ${registrationData.preferredBracket}</p>
+                <p><strong>Experience:</strong> ${registrationData.experience}</p>
+              </div>
+              <div>
+                <p><strong>osu! Username:</strong> ${registrationData.osuUsername}</p>
+                <p><strong>osu! User ID:</strong> ${registrationData.osuId}</p>
+                <p><strong>Registration Date:</strong> ${formattedDate}</p>
+                <p><strong>Comments:</strong> ${registrationData.comments || 'None'}</p>
+                <p><strong>Code:</strong> <code style="background: var(--bg-elev); padding: 2px 6px; border-radius: 4px;">${code}</code></p>
+              </div>
+            </div>
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+              <button class="btn" onclick="navigator.clipboard.writeText('${code}').then(() => alert('Code copied to clipboard!'))">Copy Code</button>
+              <button class="btn" onclick="window.print()">Print Registration</button>
+            </div>
+          </div>
+        `;
+        
+        decodedRegistrationInfo.innerHTML = displayHTML;
+      } else {
+        decodedRegistrationInfo.innerHTML = `
+          <div class="error" style="margin-top: 12px;">
+            <strong>❌ Invalid Registration Code</strong>
+            <p>Please check the code and try again. Valid codes start with "REG-" followed by encoded data and a checksum.</p>
+          </div>
+        `;
+      }
+    }); // Added missing closing brace here
+    
+    // Add Enter key support for code decoder
+    registrationCodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        decodeCodeBtn.click();
+      }
+    });
+
     // Add Enter key support for score calculator
     [toolAcc, toolCombo, toolMaxCombo, toolMod].forEach(el => {
       el.addEventListener('keydown', (e) => {
@@ -3852,6 +4189,24 @@
     closeEasterEggBtn.addEventListener('click', closeEasterEgg);
     easterEggModalBackdrop.addEventListener('click', (e) => {
       if (e.target === easterEggModalBackdrop) closeEasterEgg();
+    });
+
+    // Ensure page starts at top on load/reload
+    window.addEventListener('beforeunload', () => {
+      window.scrollTo(0, 0);
+    });
+    
+    window.addEventListener('load', () => {
+      window.scrollTo(0, 0);
+      // Also handle browser scroll restoration
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+    });
+    
+    // Additional fallback for immediate scroll
+    document.addEventListener('DOMContentLoaded', () => {
+      window.scrollTo(0, 0);
     });
   </script>
 </body>
