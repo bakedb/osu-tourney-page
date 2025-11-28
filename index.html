@@ -5,6 +5,373 @@
   <title>osu! Tournament Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
+  <!-- Loading Splash Screen -->
+  <style>
+    /* Splash Screen Styles */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0f13 0%, #1a1a2e 50%, #16213e 100%);
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+    
+    .splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .splash-content {
+      text-align: center;
+      color: #ffffff;
+    }
+    
+    .splash-logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F15%2FOSU-Logo.png&f=1&nofb=1&ipt=5003f42896cf3362002c6bce13b638d516806d1e29bbcfb89d46f6343334fd83');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+    
+    .splash-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #ff66aa, #7a2beb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+    }
+    
+    .splash-subtitle {
+      font-size: 1.2rem;
+      color: #b7b7c9;
+      margin-bottom: 20px;
+    }
+    
+    .splash-loader {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 30px;
+      justify-content: center;
+    }
+    
+    .splash-throbber {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 102, 170, 0.3);
+      border-top: 3px solid #ff66aa;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .splash-progress {
+      width: 200px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    
+    .splash-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff66aa, #7a2beb);
+      border-radius: 2px;
+      animation: loading 3s ease-out forwards;
+    }
+    
+    @keyframes loading {
+      0% { width: 0%; }
+      15% { width: 8%; }
+      28% { width: 22%; }
+      35% { width: 25%; }
+      42% { width: 38%; }
+      58% { width: 45%; }
+      65% { width: 62%; }
+      72% { width: 68%; }
+      78% { width: 75%; }
+      85% { width: 88%; }
+      92% { width: 95%; }
+      100% { width: 100%; }
+    }
+    
+    .splash-tips {
+      position: absolute;
+      bottom: 40px;
+      text-align: center;
+      color: #b7b7c9;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .splash-simple-link {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ffffff;
+      font-size: 0.8rem;
+      opacity: 0.8;
+      text-decoration: none;
+      transition: opacity 0.3s ease, color 0.3s ease;
+    }
+    
+    .splash-simple-link:hover {
+      opacity: 1;
+      color: #ff66aa;
+    }
+    
+    /* Theme-specific splash styles */
+    [data-theme="frutiger-aero"] .splash-screen {
+      background: linear-gradient(135deg, #e8f4ff 0%, #caf0f8 25%, #90e0ef 50%, #00b4d8 75%, #0077b6 100%);
+    }
+    
+    [data-theme="frutiger-aero"] .splash-logo {
+      background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F15%2FOSU-Logo.png&f=1&nofb=1&ipt=5003f42896cf3362002c6bce13b638d516806d1e29bbcfb89d46f6343334fd83');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: brightness(0) invert(1);
+    }
+    
+    [data-theme="frutiger-aero"] .splash-title {
+      background: linear-gradient(45deg, #00b4d8, #0077b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    [data-theme="frutiger-aero"] .splash-throbber {
+      border: 3px solid rgba(0, 180, 216, 0.3);
+      border-top: 3px solid #00b4d8;
+    }
+    
+    [data-theme="frutiger-aero"] .splash-simple-link {
+      color: #0066cc;
+    }
+    
+    [data-theme="frutiger-aero"] .splash-simple-link:hover {
+      color: #00b4d8;
+    }
+    
+    [data-theme="frutiger-aero"] .splash-progress-bar {
+      background: linear-gradient(90deg, #00b4d8, #0077b6);
+    }
+    
+    [data-theme="windows-9x"] .splash-screen {
+      background: #008080;
+      border: 4px solid #000000;
+      box-sizing: border-box;
+    }
+    
+    [data-theme="windows-9x"] .splash-logo {
+      background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F15%2FOSU-Logo.png&f=1&nofb=1&ipt=5003f42896cf3362002c6bce13b638d516806d1e29bbcfb89d46f6343334fd83');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: brightness(0) invert(1);
+      animation: none;
+    }
+    
+    [data-theme="windows-9x"] .splash-title {
+      color: #ffffff;
+      background: none;
+      -webkit-text-fill-color: #ffffff;
+    }
+    
+    [data-theme="windows-9x"] .splash-throbber {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid #ffffff;
+      animation: none;
+    }
+    
+    [data-theme="windows-9x"] .splash-simple-link {
+      color: #ffffff;
+    }
+    
+    [data-theme="windows-9x"] .splash-simple-link:hover {
+      color: #00ffff;
+    }
+    
+    [data-theme="windows-9x"] .splash-progress-bar {
+      background: #ffffff;
+      animation: none;
+      width: 50%;
+    }
+    
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0; }
+    }
+    
+    [data-theme="windows-10"] .splash-screen {
+      background: linear-gradient(135deg, #f3f3f3 0%, #ffffff 50%, #e8e8e8 100%);
+    }
+    
+    [data-theme="windows-10"] .splash-logo {
+      background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F15%2FOSU-Logo.png&f=1&nofb=1&ipt=5003f42896cf3362002c6bce13b638d516806d1e29bbcfb89d46f6343334fd83');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    [data-theme="windows-10"] .splash-title {
+      background: linear-gradient(45deg, #0078d4, #106ebe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    [data-theme="windows-10"] .splash-throbber {
+      border: 3px solid rgba(0, 120, 212, 0.3);
+      border-top: 3px solid #0078d4;
+    }
+    
+    [data-theme="windows-10"] .splash-simple-link {
+      color: #0078d4;
+    }
+    
+    [data-theme="windows-10"] .splash-simple-link:hover {
+      color: #106ebe;
+    }
+    
+    [data-theme="windows-10"] .splash-progress-bar {
+      background: linear-gradient(90deg, #0078d4, #106ebe);
+    }
+    
+    [data-theme="macosx"] .splash-screen {
+      background: linear-gradient(180deg, #d4d4d4 0%, #e8e8e8 20%, #f0f0f0 40%, #e8e8e8 60%, #d4d4d4 100%);
+    }
+    
+    [data-theme="macosx"] .splash-logo {
+      background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F15%2FOSU-Logo.png&f=1&nofb=1&ipt=5003f42896cf3362002c6bce13b638d516806d1e29bbcfb89d46f6343334fd83');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    [data-theme="macosx"] .splash-title {
+      background: linear-gradient(45deg, #0066cc, #0052a3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    [data-theme="macosx"] .splash-throbber {
+      border: 3px solid rgba(0, 102, 204, 0.3);
+      border-top: 3px solid #0066cc;
+    }
+    
+    [data-theme="macosx"] .splash-simple-link {
+      color: #0066cc;
+    }
+    
+    [data-theme="macosx"] .splash-simple-link:hover {
+      color: #0052a3;
+    }
+    
+    [data-theme="macosx"] .splash-progress-bar {
+      background: linear-gradient(90deg, #0066cc, #0052a3);
+    }
+    
+    [data-theme="argon"] .splash-screen {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+    }
+    
+    [data-theme="argon"] .splash-title {
+      background: linear-gradient(45deg, #00f1ff, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    [data-theme="argon"] .splash-throbber {
+      border: 3px solid rgba(0, 241, 255, 0.3);
+      border-top: 3px solid #00f1ff;
+    }
+    
+    [data-theme="argon"] .splash-simple-link {
+      color: #00f1ff;
+    }
+    
+    [data-theme="argon"] .splash-simple-link:hover {
+      color: #00d4ff;
+    }
+    
+    [data-theme="argon"] .splash-progress-bar {
+      background: linear-gradient(90deg, #00f1ff, #00d4ff);
+    }
+    
+    [data-theme="triangles"] .splash-screen {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+    
+    [data-theme="triangles"] .splash-screen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(233, 69, 96, 0.1) 10px, rgba(233, 69, 96, 0.1) 20px);
+      pointer-events: none;
+    }
+    
+    [data-theme="triangles"] .splash-logo {
+      background-image: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F15%2FOSU-Logo.png&f=1&nofb=1&ipt=5003f42896cf3362002c6bce13b638d516806d1e29bbcfb89d46f6343334fd83');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    [data-theme="triangles"] .splash-title {
+      background: linear-gradient(45deg, #e94560, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    [data-theme="triangles"] .splash-throbber {
+      border: 3px solid rgba(233, 69, 96, 0.3);
+      border-top: 3px solid #e94560;
+    }
+    
+    [data-theme="triangles"] .splash-simple-link {
+      color: #e94560;
+    }
+    
+    [data-theme="triangles"] .splash-simple-link:hover {
+      color: #ff6b6b;
+    }
+    
+    [data-theme="triangles"] .splash-progress-bar {
+      background: linear-gradient(90deg, #e94560, #ff6b6b);
+    }
+  </style>
+  
   <!-- Immediate scroll reset to prevent page loading scrolled down -->
   <script>
     // Run immediately to prevent any scroll restoration
@@ -3839,6 +4206,29 @@
   </style>
 </head>
 <body>
+  <!-- Loading Splash Screen -->
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-content">
+      <div class="splash-logo"></div>
+      <div class="splash-title">osu! Tournament Portal</div>
+      <div class="splash-subtitle">Loading tournament data...</div>
+      
+      <div class="splash-loader">
+        <div class="splash-throbber"></div>
+      </div>
+      
+      <div class="splash-progress">
+        <div class="splash-progress-bar"></div>
+      </div>
+    </div>
+    
+    <div class="splash-tips">
+      <div id="splashTip">Preparing your tournament experience...</div>
+    </div>
+    
+    <a href="simple.html" class="splash-simple-link">Simple HTML View</a>
+  </div>
+
   <!-- Blue Screen of Death Overlay -->
   <div class="bsod-overlay" id="bsodOverlay">
     <div class="bsod-content">
@@ -3962,6 +4352,11 @@ Technical information:
       <div class="legacy-versions-list">
         <p class="legacy-description">Access previous versions of the osu! Tournament Portal:</p>
         <div class="legacy-version-grid">
+          <a href="/osuTP/legacy/v0.8.html" class="legacy-version-card">
+            <div class="legacy-version-number">v0.8</div>
+            <div class="legacy-version-date">27 November 2025</div>
+            <div class="legacy-version-desc">Added BSOD in Windows theme, reimplemented live brackets tab, changed the registration codes to be decoded anywhere (not just in local browser storage), changed the registration form, slightly updated home page.</div>
+          </a>
           <a href="/osuTP/legacy/v0.7.html" class="legacy-version-card">
             <div class="legacy-version-number">v0.7</div>
             <div class="legacy-version-date">27 November 2025</div>
@@ -4511,7 +4906,7 @@ Technical information:
     // ------------------------------
     // Configuration Variables
     // ------------------------------
-    const VERSION_NUMBER = "0.8";
+    const VERSION_NUMBER = "0.9";
     const IS_DEVELOPMENT = false; // Set to false for production
     
     // Computed values based on configuration
@@ -4672,7 +5067,7 @@ Technical information:
     const GITHUB_REPO = 'bakedb/osuTP'; // Change this to your repo
     const NEWS_DIR = 'news';
     
-    // Enhanced markdown parser for news content
+    // Enhanced markdown parser for news content (with image support)
     function parseMarkdown(markdown) {
       let html = markdown;
       
@@ -4687,6 +5082,9 @@ Technical information:
       
       // Links
       html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+      
+      // Images - convert markdown image syntax to HTML images
+      html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0;" />');
       
       // Code blocks
       html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -4705,6 +5103,8 @@ Technical information:
       html = html.replace(/(<\/h[1-6]>)<\/p>/g, '$1');
       html = html.replace(/<p>(<ul>)/g, '$1');
       html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<img)/g, '$1');
+      html = html.replace(/(\/>)<\/p>/g, '$1');
       
       return html;
     }
@@ -4748,56 +5148,65 @@ Technical information:
       return 'Unknown Date';
     }
     
-    // Load news articles from GitHub repository
+    // Google Docs configuration
+    const GOOGLE_DOC_ID = '1UlTaHGQA2h-X8-_Im30YFjnWOT_GDh-3_ECeyOAuADQ'; // Replace with your Google Doc ID
+    
+    // Load news articles from Google Doc
     async function loadNewsArticles() {
       try {
         const newsContainer = document.getElementById('newsContent');
         newsContainer.innerHTML = '<div class="news-loading"><p>Loading news articles...</p></div>';
         
-        // Try to load from GitHub API
-        const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${NEWS_DIR}`;
+        // Try to load from Google Doc
+        const docUrl = `https://docs.google.com/document/d/${GOOGLE_DOC_ID}/export?format=txt`;
+        console.log('Fetching news from Google Doc:', docUrl);
         
         try {
-          const response = await fetch(apiUrl);
+          const response = await fetch(docUrl);
+          console.log('Google Doc response status:', response.status);
+          
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
           
-          const files = await response.json();
+          const text = await response.text();
+          console.log('Google Doc content length:', text.length);
           
-          // Filter for markdown files and sort by date (newest first)
-          const markdownFiles = files
-            .filter(file => file.name.endsWith('.md'))
-            .sort((a, b) => {
-              const dateA = extractDateFromFilename(a.name);
-              const dateB = extractDateFromFilename(b.name);
-              return new Date(b.name) - new Date(a.name);
-            });
+          // Split articles by article break marker (supports both --- and —)
+          const articleSections = text.split(/(?:^|\n)\s*(?:---|—)\s*(?:\n|$)/).filter(section => section.trim().length > 0);
+          console.log('Found article sections:', articleSections.length);
           
-          // Load content for each file
+          // Parse each section into an article
           newsArticles = [];
           
-          for (const file of markdownFiles) {
+          for (let i = 0; i < articleSections.length; i++) {
+            const section = articleSections[i];
             try {
-              const contentResponse = await fetch(file.download_url);
-              if (contentResponse.ok) {
-                const content = await contentResponse.text();
-                newsArticles.push({
-                  filename: file.name,
-                  title: extractTitle(content),
-                  excerpt: extractExcerpt(content),
-                  content: content,
-                  date: extractDateFromFilename(file.name),
-                  url: file.download_url
-                });
+              const article = parseArticleSection(section.trim(), i); // Pass original index
+              if (article) {
+                console.log('Parsed article:', article.title, 'Date:', article.date);
+                newsArticles.push(article);
               }
             } catch (error) {
-              console.warn(`Failed to load ${file.name}:`, error);
+              console.warn('Failed to parse article section:', error);
             }
           }
           
-        } catch (apiError) {
-          console.warn('GitHub API failed, using fallback:', apiError);
+          // Sort articles by original document order (bottom of doc = top of page)
+          newsArticles.sort((a, b) => {
+            return b.originalIndex - a.originalIndex; // Reverse document order
+          });
+          
+          console.log('Total articles loaded:', newsArticles.length);
+          console.log('Articles sorted by document order (newest first):', newsArticles.map(a => `${a.title} (Index: ${a.originalIndex})`));
+          
+          if (newsArticles.length === 0) {
+            console.log('No articles loaded, using sample articles');
+            loadSampleArticles();
+          }
+          
+        } catch (docError) {
+          console.warn('Google Doc failed, using fallback:', docError);
           // Fallback to sample articles
           loadSampleArticles();
         }
@@ -4809,6 +5218,61 @@ Technical information:
         console.error('Failed to load news articles:', error);
         displayError('Failed to load news articles. Please try again later.');
       }
+    }
+    
+    // Parse a section from Google Doc into an article object
+    function parseArticleSection(section, originalIndex) {
+      const lines = section.split('\n').filter(line => line.trim());
+      
+      if (lines.length === 0) return null;
+      
+      // Extract title (first line that starts with #)
+      let title = 'Untitled Article';
+      let contentLines = [];
+      let date = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      let rawDate = new Date(); // Store raw date for sorting
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Check if line is a title (starts with #)
+        if (line.startsWith('#') && !title || title === 'Untitled Article') {
+          title = line.replace(/^#+\s*/, '');
+        }
+        // Check if line looks like a date (YYYY-MM-DD format or contains "Published")
+        else if (line.match(/^\d{4}-\d{2}-\d{2}/) || line.toLowerCase().includes('published')) {
+          // Try to extract date from the line
+          const dateMatch = line.match(/\d{4}-\d{2}-\d{2}/);
+          if (dateMatch) {
+            rawDate = new Date(dateMatch[0]);
+            date = rawDate.toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            });
+          }
+        }
+        else {
+          contentLines.push(line);
+        }
+      }
+      
+      const content = contentLines.join('\n');
+      const excerpt = extractExcerpt(content);
+      
+      return {
+        filename: title.toLowerCase().replace(/\s+/g, '-') + '.md',
+        title: title,
+        excerpt: excerpt,
+        content: content,
+        date: date,
+        rawDate: rawDate, // Store raw date for sorting
+        originalIndex: originalIndex // Store original document order
+      };
     }
     
     // Load sample articles as fallback
@@ -4938,11 +5402,15 @@ These changes will be enforced starting November 15th.`,
     
     // Load news content when news tab is shown
     function loadNewsContent() {
+      console.log('loadNewsContent called, currentView:', currentView, 'newsArticles.length:', newsArticles.length);
       if (currentView === 'tiles' && newsArticles.length === 0) {
+        console.log('Loading news articles...');
         loadNewsArticles();
       } else if (currentView === 'tiles') {
+        console.log('Displaying existing news tiles...');
         displayNewsTiles();
       } else if (currentView === 'article' && currentArticle) {
+        console.log('Displaying current article:', currentArticle.title);
         viewArticle(currentArticle.filename);
       }
     }
@@ -5354,45 +5822,6 @@ These changes will be enforced starting November 15th.`,
     /* ------------------------------
        Tab navigation with role-based access
        ------------------------------ */
-    function showTab(name) {
-      // Check if user has permission to access this tab
-      if (name === 'tools' && !['Admin', 'Participant'].includes(currentUserRole)) {
-        signInErrorEl.textContent = 'Admin or Participant access required to view Tools.';
-        openModal();
-        return;
-      }
-      
-      // Check if user has permission to access Live Scores tab (brackets is now public)
-      if (name === 'live' && currentUserRole !== 'Admin') {
-        signInErrorEl.textContent = 'Admin access required to view this tab.';
-        openModal();
-        return;
-      }
-      
-      // Remove all tab classes from body
-      document.body.classList.remove('tab-home', 'tab-news', 'tab-brackets', 'tab-live', 'tab-rules', 'tab-beatmaps', 'tab-tools');
-      
-      // Add current tab class for theme variations
-      document.body.classList.add(`tab-${name}`);
-      
-      for (const t of tabs) t.classList.toggle('active', t.dataset.tab === name);
-      for (const key of Object.keys(panels)) {
-        panels[key].style.display = key === name ? 'block' : 'none';
-      }
-      
-      // Update tools visibility based on role
-      if (name === 'tools') {
-        updateToolsVisibility();
-      }
-      
-      // Load news content when news tab is shown
-      if (name === 'news') {
-        loadNewsContent();
-      }
-      
-      // Update hash for deep linking without scrolling
-      history.replaceState(null, '', `#${name}`);
-    }
 
     tabs.forEach(btn => {
       btn.addEventListener('click', () => showTab(btn.dataset.tab));
@@ -6263,6 +6692,22 @@ These changes will be enforced starting November 15th.`,
 
     // Enhanced tab switching to handle auto-refresh
     function showTab(tabName) {
+      console.log('Switching to tab:', tabName);
+      
+      // Check if user has permission to access this tab
+      if (tabName === 'tools' && !['Admin', 'Participant'].includes(currentUserRole)) {
+        signInErrorEl.textContent = 'Admin or Participant access required to view Tools.';
+        openModal();
+        return;
+      }
+      
+      // Check if user has permission to access Live Scores tab (brackets is now public)
+      if (tabName === 'live' && currentUserRole !== 'Admin') {
+        signInErrorEl.textContent = 'Admin access required to view this tab.';
+        openModal();
+        return;
+      }
+      
       // Hide all tabs
       document.querySelectorAll('[role="tabpanel"]').forEach(tab => {
         tab.style.display = 'none';
@@ -6289,6 +6734,17 @@ These changes will be enforced starting November 15th.`,
       document.body.classList.remove('tab-home', 'tab-news', 'tab-brackets', 'tab-live', 'tab-rules', 'tab-beatmaps', 'tab-tools');
       document.body.classList.add(`tab-${tabName}`);
       
+      // Update tools visibility based on role
+      if (tabName === 'tools') {
+        updateToolsVisibility();
+      }
+      
+      // Load news content when news tab is shown
+      if (tabName === 'news') {
+        console.log('News tab selected, loading content...');
+        loadNewsContent();
+      }
+      
       // Handle auto-refresh for brackets tab
       if (tabName === 'brackets') {
         startBracketAutoRefresh();
@@ -6306,6 +6762,38 @@ These changes will be enforced starting November 15th.`,
 
     // Initialize auto-refresh on page load if brackets tab is active
     document.addEventListener('DOMContentLoaded', () => {
+      // Splash screen functionality
+      const splashScreen = document.getElementById('splashScreen');
+      const splashTip = document.getElementById('splashTip');
+      const tips = [
+        'Preparing your tournament experience...',
+        'Loading tournament brackets...',
+        'Fetching latest results...',
+        'Checking for updates...',
+        'Almost ready...',
+        'Finalizing setup...'
+      ];
+      
+      let tipIndex = 0;
+      let tipInterval = setInterval(() => {
+        tipIndex = (tipIndex + 1) % tips.length;
+        if (splashTip) {
+          splashTip.textContent = tips[tipIndex];
+        }
+      }, 2000);
+      
+      // Hide splash screen after page loads
+      setTimeout(() => {
+        clearInterval(tipInterval);
+        if (splashScreen) {
+          splashScreen.classList.add('hidden');
+          // Remove from DOM after transition
+          setTimeout(() => {
+            splashScreen.style.display = 'none';
+          }, 500);
+        }
+      }, 3000); // Show for 3 seconds
+      
       const hashTab = location.hash.slice(1);
       if (['home', 'brackets', 'live', 'rules', 'beatmaps', 'tools'].includes(hashTab)) {
         showTab(hashTab);
