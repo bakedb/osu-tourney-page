@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>osu! Tournament Portal - Basic View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Basic reset and simple styling for old browsers */
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.4;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+    
+    .header {
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff66aa;
+    }
+    
+    .nav {
+      margin: 20px 0;
+    }
+    
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .nav-item {
+      display: inline;
+      margin-right: 15px;
+    }
+    
+    .nav-link {
+      text-decoration: none;
+      color: #0066cc;
+      padding: 5px 10px;
+      border: 1px solid #0066cc;
+    }
+    
+    .nav-link:hover, .nav-link:focus {
+      background: #0066cc;
+      color: white;
+    }
+    
+    .nav-link.active {
+      background: #ff66aa;
+      color: white;
+      border-color: #ff66aa;
+    }
+    
+    .content {
+      margin: 20px 0;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+    }
+    
+    h2 {
+      color: #333;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    
+    h3 {
+      color: #555;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    
+    button {
+      background: #ff66aa;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    button:hover, button:focus {
+      background: #e55a9a;
+    }
+    
+    .link-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .link-list li {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ddd;
+    }
+    
+    .link-list a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    
+    .link-list a:hover, .link-list a:focus {
+      text-decoration: underline;
+    }
+    
+    .info-box {
+      background: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .warning-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ccc;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+    
+    /* Simple responsive design */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 15px;
+      }
+      
+      .nav-item {
+        display: block;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">osu! Tournament Portal</div>
+      <div>Basic View - Optimized for slow connections and old browsers</div>
+    </div>
+    
+    <div class="nav">
+      <ul class="nav-list">
+        <li class="nav-item"><a href="#home" class="nav-link active">Home</a></li>
+        <li class="nav-item"><a href="#brackets" class="nav-link">Brackets</a></li>
+        <li class="nav-item"><a href="#live" class="nav-link">Live</a></li>
+        <li class="nav-item"><a href="#rules" class="nav-link">Rules</a></li>
+        <li class="nav-item"><a href="#beatmaps" class="nav-link">Beatmaps</a></li>
+        <li class="nav-item"><a href="#tools" class="nav-link">Tools</a></li>
+      </ul>
+    </div>
+    
+    <div class="content">
+      <div class="info-box">
+        <strong>Basic View Active:</strong> You're viewing the simplified version of our tournament portal. 
+        This version loads quickly and works on older browsers without JavaScript.
+      </div>
+      
+      <div class="section">
+        <h2>Latest News</h2>
+        <div id="newsContent">
+          <p>Loading news...</p>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>Welcome to osu! Tournament Portal</h2>
+        <p>This is the basic version of our tournament portal, designed for:</p>
+        <ul>
+          <li>Slow internet connections</li>
+          <li>Old browsers without modern CSS/JS support</li>
+          <li>Users who prefer a simple, fast interface</li>
+        </ul>
+        
+        <h3>Quick Links</h3>
+        <ul class="link-list">
+          <li><a href="#registration">Tournament Registration</a> - Sign up for upcoming tournaments</li>
+          <li><a href="#schedule">Tournament Schedule</a> - View match times and dates</li>
+          <li><a href="#results">Tournament Results</a> - Check recent tournament outcomes</li>
+          <li><a href="#standings">Current Standings</a> - See team rankings and scores</li>
+        </ul>
+      </div>
+      
+      <div class="section">
+        <h2>Featured Tournaments</h2>
+        <ul class="link-list">
+          <li>
+            <strong>osu! World Cup 2024</strong><br>
+            <small>Registration: Open | Starts: Dec 1, 2024</small><br>
+            <a href="#owc2024">View Details →</a>
+          </li>
+          <li>
+            <strong>Community Tournament #15</strong><br>
+            <small>Registration: Open | Starts: Dec 15, 2024</small><br>
+            <a href="#comm15">View Details →</a>
+          </li>
+          <li>
+            <strong>New Player Cup</strong><br>
+            <small>Registration: Closed | Starts: Nov 25, 2024</small><br>
+            <a href="#npc2024">View Details →</a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="section">
+        <h2>Registration Code Encoder</h2>
+        <p>Generate your registration code for tournament access:</p>
+        <div class="form-group">
+          <label for="regUsername">osu! Username:</label>
+          <input type="text" id="regUsername" name="regUsername" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+          <label for="regCode">Registration Code:</label>
+          <input type="text" id="regCode" name="regCode" readonly placeholder="Click generate to create code">
+        </div>
+        <button type="button" onclick="generateRegistrationCode()">Generate Code</button>
+        <button type="button" onclick="copyRegistrationCode()">Copy Code</button>
+      </div>
+      
+      <div class="section">
+        <h2>Quick Tournament Info</h2>
+        <h3>Current Status</h3>
+        <ul>
+          <li><strong>Active Tournaments:</strong> 3</li>
+          <li><strong>Upcoming:</strong> 2 tournaments starting next week</li>
+          <li><strong>Registration Open:</strong> 2 tournaments</li>
+          <li><strong>Live Matches:</strong> Check the Live tab for ongoing matches</li>
+        </ul>
+        
+        <h3>How to Participate</h3>
+        <ol>
+          <li>Register for an account on our portal</li>
+          <li>Sign up for your desired tournament</li>
+          <li>Check the schedule for match times</li>
+          <li>Join the Discord server for communication</li>
+          <li>Follow the rules and have fun!</li>
+        </ol>
+      </div>
+      
+      <div class="warning-box">
+        <strong>Note:</strong> This basic view has limited functionality. 
+        For the full experience with live updates, advanced features, and modern UI, 
+        please visit our <a href="index.html">main portal</a> using a modern browser.
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>osu! Tournament Portal - Basic View</p>
+      <p>&copy; 2024 | Optimized for accessibility and speed</p>
+      <p>
+        <a href="#help">Help</a> | 
+        <a href="#contact">Contact</a> | 
+        <a href="#rules">Rules</a> | 
+        <a href="index.html">Full Portal</a>
+      </p>
+    </div>
+  </div>
+  
+  <script>
+    // Simple news loading function
+    async function loadSimpleNews() {
+      try {
+        const newsContent = document.getElementById('newsContent');
+        
+        // Try to load from Google Doc (same as main portal)
+        const docUrl = 'https://docs.google.com/document/d/1UlTaHGQA2h-X8-_Im30YFjnWOT_GDh-3_ECeyOAuADQ/export?format=txt';
+        
+        const response = await fetch(docUrl);
+        if (!response.ok) {
+          throw new Error('Failed to load news');
+        }
+        
+        const text = await response.text();
+        const articleSections = text.split(/(?:^|\n)\s*(?:---|—)\s*(?:\n|$)/).filter(section => section.trim().length > 0);
+        
+        // Display latest 3 articles
+        let newsHtml = '';
+        const maxArticles = Math.min(3, articleSections.length);
+        
+        for (let i = 0; i < maxArticles; i++) {
+          const section = articleSections[articleSections.length - 1 - i]; // Get newest first
+          const lines = section.split('\n').filter(line => line.trim());
+          
+          if (lines.length > 0) {
+            let title = 'Untitled News';
+            let content = '';
+            
+            // Extract title and content
+            for (let j = 0; j < lines.length; j++) {
+              const line = lines[j].trim();
+              if (line.startsWith('#') && title === 'Untitled News') {
+                title = line.replace(/^#+\s*/, '');
+              } else if (!line.match(/^\d{4}-\d{2}-\d{2}/) && !line.toLowerCase().includes('published')) {
+                content += line + ' ';
+              }
+            }
+            
+            // Truncate content
+            const excerpt = content.substring(0, 200) + (content.length > 200 ? '...' : '');
+            
+            newsHtml += '<div style="margin-bottom: 20px; padding: 15px; background: white; border: 1px solid #ddd;">';
+            newsHtml += '<h3 style="margin: 0 0 10px 0; color: #333;">' + title + '</h3>';
+            newsHtml += '<p style="margin: 0; color: #666; font-size: 14px;">' + excerpt + '</p>';
+            newsHtml += '</div>';
+          }
+        }
+        
+        if (newsHtml) {
+          newsContent.innerHTML = newsHtml;
+        } else {
+          newsContent.innerHTML = '<p>No news available.</p>';
+        }
+        
+      } catch (error) {
+        console.error('Failed to load news:', error);
+        document.getElementById('newsContent').innerHTML = '<p>Unable to load news at this time.</p>';
+      }
+    }
+    
+    // Registration code generator
+    function generateRegistrationCode() {
+      const username = document.getElementById('regUsername').value.trim();
+      const codeField = document.getElementById('regCode');
+      
+      if (!username) {
+        alert('Please enter your username first.');
+        return;
+      }
+      
+      // Simple encoding (same as main portal)
+      const encoded = btoa(username + ':' + Date.now().toString().slice(-6));
+      codeField.value = encoded;
+    }
+    
+    function copyRegistrationCode() {
+      const codeField = document.getElementById('regCode');
+      if (!codeField.value) {
+        alert('Please generate a code first.');
+        return;
+      }
+      
+      // Select and copy
+      codeField.select();
+      document.execCommand('copy');
+      alert('Registration code copied to clipboard!');
+    }
+    
+    // Load news when page loads
+    if (document.addEventListener) {
+      document.addEventListener('DOMContentLoaded', loadSimpleNews);
+    } else {
+      // Fallback for older browsers
+      window.onload = loadSimpleNews;
+    }
+  </script>
+</body>
+</html>
